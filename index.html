@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jokenpô Simplificado</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .jogadas {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .resultado {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .empate {
+            background: #FFF3CD;
+            color: #856404;
+        }
+        .vitoria {
+            background: #D4EDDA;
+            color: #155724;
+        }
+        .derrota {
+            background: #F8D7DA;
+            color: #721C24;
+        }
+        .placar {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            font-size: 18px;
+        }
+        .escolhas {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 20px 0;
+        }
+        .escolha {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Jokenpô</h1>
+        <p>Escolha sua jogada:</p>
+        
+        <div class="jogadas">
+            <button onclick="jogar(0)">Pedra</button>
+            <button onclick="jogar(1)">Papel</button>
+            <button onclick="jogar(2)">Tesoura</button>
+        </div>
+        
+        <div id="escolhas" class="escolhas" style="display:none;">
+            <div>
+                <p>Sua escolha:</p>
+                <p id="jogador-escolha" class="escolha">-</p>
+            </div>
+            <div>
+                <p>Computador:</p>
+                <p id="computador-escolha" class="escolha">-</p>
+            </div>
+        </div>
+        
+        <div id="resultado" class="resultado"></div>
+        
+        <div class="placar">
+            <div>Você: <span id="placar-jogador">0</span></div>
+            <div>Empates: <span id="empates">0</span></div>
+            <div>Computador: <span id="placar-computador">0</span></div>
+        </div>
+        
+        <div id="rodada">Rodada 1 de 3</div>
+    </div>
+
+    <script>
+        const itens = ['Pedra', 'Papel', 'Tesoura'];
+        let rodada = 1;
+        let jogador = 0;
+        let computador = 0;
+        let empates = 0;
+        
+        function jogar(escolha) {
+            // Mostra as escolhas
+            document.getElementById('escolhas').style.display = 'flex';
+            document.getElementById('jogador-escolha').textContent = itens[escolha];
+            
+            // Computador escolhe
+            const escolhaComputador = Math.floor(Math.random() * 3);
+            document.getElementById('computador-escolha').textContent = itens[escolhaComputador];
+            
+            // Calcula resultado
+            const resultado = (escolha - escolhaComputador + 3) % 3;
+            const elementoResultado = document.getElementById('resultado');
+            
+            if (resultado === 0) {
+                elementoResultado.textContent = "Empate!";
+                elementoResultado.className = "resultado empate";
+                empates++;
+            } else if (resultado === 1) {
+                elementoResultado.textContent = "Você ganhou!";
+                elementoResultado.className = "resultado vitoria";
+                jogador++;
+            } else {
+                elementoResultado.textContent = "Computador ganhou!";
+                elementoResultado.className = "resultado derrota";
+                computador++;
+            }
+            
+            // Atualiza placar
+            document.getElementById('placar-jogador').textContent = jogador;
+            document.getElementById('placar-computador').textContent = computador;
+            document.getElementById('empates').textContent = empates;
+            
+            // Atualiza rodada
+            rodada++;
+            document.getElementById('rodada').textContent = `Rodada ${rodada} de 3`;
+            
+            // Verifica fim do jogo
+            if (rodada > 3) {
+                if (jogador === computador) {
+                    elementoResultado.textContent += " Empate geral! Rodada extra!";
+                    document.getElementById('rodada').textContent = "Rodada extra";
+                } else {
+                    fimDoJogo();
+                }
+            }
+        }
+        
+        function fimDoJogo() {
+            const elementoResultado = document.getElementById('resultado');
+            if (jogador > computador) {
+                elementoResultado.textContent = "Fim do jogo! Você venceu!";
+                elementoResultado.className = "resultado vitoria";
+            } else {
+                elementoResultado.textContent = "Fim do jogo! Computador venceu!";
+                elementoResultado.className = "resultado derrota";
+            }
+            
+            // Desabilita botões
+            document.querySelectorAll('button').forEach(btn => {
+                btn.disabled = true;
+                btn.style.opacity = '0.6';
+            });
+            
+            // Mostra botão para jogar novamente
+            const btnNovoJogo = document.createElement('button');
+            btnNovoJogo.textContent = "Jogar Novamente";
+            btnNovoJogo.onclick = () => location.reload();
+            document.querySelector('.container').appendChild(btnNovoJogo);
+        }
+    </script>
+</body>
+</html>
